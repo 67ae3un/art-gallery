@@ -18,6 +18,14 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
     notFound();
   }
 
+  // Helper to extract Sketchfab ID
+  const getSketchfabId = (url: string) => {
+    const match = url.match(/sketchfab\.com\/(?:models\/|showcase\/)?([^/?#]+)/);
+    return match ? match[1] : null;
+  };
+
+  const sketchfabId = artwork.link ? getSketchfabId(artwork.link) : null;
+
   return (
     <div className="container mx-auto px-6 py-24">
       <Link 
@@ -29,13 +37,24 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-        {/* Cover Image */}
+        {/* Visual Content: 3D Viewer or Cover Image */}
         <div className="relative aspect-square overflow-hidden rounded-3xl bg-zinc-900 border border-white/10 group">
-          <img 
-            src={artwork.coverUrl} 
-            alt={artwork.title}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
+          {artwork.category === '3d' && sketchfabId ? (
+            <iframe
+              title={artwork.title}
+              className="w-full h-full"
+              src={`https://sketchfab.com/models/${sketchfabId}/embed?autostart=1&ui_theme=dark`}
+              frameBorder="0"
+              allowFullScreen
+              allow="autoplay; fullscreen; xr-spatial-tracking"
+            />
+          ) : (
+            <img 
+              src={artwork.coverUrl} 
+              alt={artwork.title}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          )}
         </div>
 
         {/* Content */}
@@ -64,14 +83,16 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
 
           {artwork.category === '3d' && artwork.link && (
             <div className="space-y-4">
-              <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500">Interactive 3D Content</h3>
+              <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-500">
+                {sketchfabId ? "Interactive 3D Preview Active" : "External Content"}
+              </h3>
               <a 
                 href={artwork.link}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-3 px-8 py-4 bg-white text-black font-bold rounded-2xl hover:bg-zinc-200 transition-colors w-full sm:w-auto justify-center"
               >
-                <span>View Full 3D Model</span>
+                <span>View on Original Site</span>
                 <ExternalLink size={18} />
               </a>
             </div>
@@ -84,7 +105,7 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
             </div>
             <div className="p-6 rounded-2xl bg-white/5 border border-white/5 flex flex-col space-y-2">
               <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Status</span>
-              <span className="text-lg font-medium text-white">Public Showcase</span>
+              <span className="text-lg font-medium text-white">Interactive Showcase</span>
             </div>
           </div>
         </div>
