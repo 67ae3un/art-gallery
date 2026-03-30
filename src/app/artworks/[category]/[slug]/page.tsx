@@ -20,7 +20,8 @@ export default async function ArtworkDetailPage({ params }: PageProps) {
 
   // Helper to extract Sketchfab ID
   const getSketchfabId = (url: string) => {
-    const match = url.match(/sketchfab\.com\/(?:models\/|showcase\/)?([^/?#]+)/);
+    // Matches standard IDs at the end of the URL (32 hex characters) or after a hyphen
+    const match = url.match(/(?:[a-z0-9]+-)?([a-f0-9]{32})/i) || url.match(/\/models\/([^/?#]+)/);
     return match ? match[1] : null;
   };
 
